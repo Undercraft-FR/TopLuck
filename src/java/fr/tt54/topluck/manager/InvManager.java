@@ -20,7 +20,12 @@ public class InvManager {
     public static Inventory getTopLuckInventory(int page) {
         TopLuckManager.saveTopLuck();
         Inventory inv = Bukkit.createInventory(null, 9 * 6, "§cTopLuck Page §4" + (page + 1));
-        List<Player> playersTemp = new ArrayList<>(Bukkit.getOnlinePlayers()).stream().filter(player -> !(!Main.getInstance().getConfig().getBoolean("showbypass") && Permission.hasPermission(player, "topluck.showbypass"))).collect(Collectors.toList());
+        List<Player> playersTemp = new ArrayList<>();
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            if (!(Main.getInstance().getConfig().getBoolean("showbypass") && Permission.hasPermission(player, "topluck.showbypass"))) {
+                playersTemp.add(player);
+            }
+        }
         List<Player> playersSorted = new ArrayList<>();
         List<Player> players = new ArrayList<>();
         for (Player p : playersTemp) {
@@ -82,7 +87,7 @@ public class InvManager {
             inv.setItem(i + 1, builder.build());
         }
 
-        inv.setItem(9 * 6 - 1, new ItemBuilder(Material.BARRIER).setName(Main.getMessages().getMessage("inventory.quit")).build());
+        inv.setItem(9 * 6 - 1, new ItemBuilder(Material.REDSTONE_LAMP_OFF).setName(Main.getMessages().getMessage("inventory.quit")).build());
         inv.setItem(49, new ItemBuilder(Material.ENDER_PEARL).setName(Main.getMessages().getMessage("inventory.teleport")).build());
         inv.setItem(48, new ItemBuilder(Material.CHEST).setName(Main.getMessages().getMessage("inventory.clear")).build());
 

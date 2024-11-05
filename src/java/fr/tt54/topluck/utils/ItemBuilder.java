@@ -4,7 +4,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -105,7 +104,7 @@ public class ItemBuilder {
 
     public ItemBuilder hideEnchants() {
         ItemMeta meta = this.item.getItemMeta();
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.addEnchant(Enchantment.DURABILITY, 1, true);
         this.item.setItemMeta(meta);
         return this;
     }

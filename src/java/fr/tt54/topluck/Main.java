@@ -48,7 +48,7 @@ public class Main extends JavaPlugin {
 
         if (!this.getConfig().getString("configversion").equalsIgnoreCase(configVersion)) {
             System.out.println(messages.getMessage("badconfigversion", "%configversion%", this.getConfig().getString("configversion"), "%newversion%", configVersion));
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 if (Permission.hasPermission(player, "topluck.reload")) {
                     player.sendMessage("");
                     player.sendMessage(messages.getMessage("badconfigversion", "%configversion%", this.getConfig().getString("configversion"), "%newversion%", configVersion));
@@ -57,7 +57,7 @@ public class Main extends JavaPlugin {
         }
         if (!messages.getMessage("version").equalsIgnoreCase(messagesVersion)) {
             System.out.println(messages.getMessage("badmessagesversion", "%messagesversion%", messages.getMessage("version"), "%newversion%", messagesVersion));
-            for (Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                 if (Permission.hasPermission(player, "topluck.reload")) {
                     player.sendMessage("");
                     player.sendMessage(messages.getMessage("badmessagesversion", "%messagesversion%", messages.getMessage("version"), "%newversion%", messagesVersion));

@@ -13,6 +13,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,11 +21,14 @@ import java.util.stream.Collectors;
 public class CmdTopLuck implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        System.out.println("onCommand called with args: " + Arrays.toString(args));
+
         if (!(sender instanceof Player)) {
+            System.out.println("Command sender is not a player");
             if (args[0].equalsIgnoreCase("reload") && args.length == 1) {
                 Main.getInstance().reload();
                 System.out.println(Main.getMessages().getMessage("reload"));
-                for (Player player : Bukkit.getOnlinePlayers()) {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (Permission.hasPermission(player, "topluck.reload")) {
                         player.sendMessage(Main.getMessages().getMessage("reload"));
                     }
@@ -35,8 +39,12 @@ public class CmdTopLuck implements CommandExecutor, TabCompleter {
             return false;
         }
 
+        Player playerSender = (Player) sender;
+        System.out.println("Command sender is a player: " + playerSender.getName());
+
         if (args.length >= 1) {
             if (args[0].equalsIgnoreCase("reload")) {
+                System.out.println("Reload command received");
                 if (Permission.hasPermission(sender, "topluck.reload")) {
                     if (args.length != 1) {
                         sender.sendMessage(Main.getMessages().getBadUsageMessage("/" + label + " reload"));
@@ -44,7 +52,7 @@ public class CmdTopLuck implements CommandExecutor, TabCompleter {
                     }
                     Main.getInstance().reload();
                     System.out.println(Main.getMessages().getMessage("reload"));
-                    for (Player player : Bukkit.getOnlinePlayers()) {
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                         if (Permission.hasPermission(player, "topluck.reload")) {
                             player.sendMessage(Main.getMessages().getMessage("reload"));
                         }
@@ -55,12 +63,13 @@ public class CmdTopLuck implements CommandExecutor, TabCompleter {
                     return false;
                 }
             } else if (args[0].equalsIgnoreCase("registerblock")) {
+                System.out.println("Register block command received");
                 if (!Permission.hasPermission(sender, "topluck.see")) {
                     sender.sendMessage(Main.getMessages().getMessage("notpermission"));
                     return false;
                 }
 
-                int displayId = ((Player) sender).getItemInHand().getTypeId();
+                int displayId = playerSender.getItemInHand().getTypeId();
                 if (args.length == 2) {
                     try {
                         displayId = Integer.parseInt(args[1]);
@@ -75,16 +84,17 @@ public class CmdTopLuck implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                if (((Player) sender).getItemInHand() == null || ((Player) sender).getItemInHand().getType() == Material.AIR) {
+                if (playerSender.getItemInHand() == null || playerSender.getItemInHand().getType() == Material.AIR) {
                     sender.sendMessage(Main.getMessages().getMessage("notiteminhand"));
                     return false;
                 }
 
-                TopLuckManager.addResource(((Player) sender).getItemInHand(), displayId);
-                sender.sendMessage(Main.getMessages().getMessage("blockregistered", "%type%", ((Player) sender).getItemInHand().getType().name(), "%data%", "" + ((Player) sender).getItemInHand().getData().getData()));
+                TopLuckManager.addResource(playerSender.getItemInHand(), displayId);
+                sender.sendMessage(Main.getMessages().getMessage("blockregistered", "%type%", playerSender.getItemInHand().getType().name(), "%data%", "" + playerSender.getItemInHand().getData().getData()));
 
                 return true;
             } else {
+                System.out.println("Player inventory command received");
                 if (Permission.hasPermission(sender, "topluck.see")) {
                     if (args.length != 1) {
                         sender.sendMessage(Main.getMessages().getBadUsageMessage("/" + label + " [joueur]"));
@@ -96,7 +106,7 @@ public class CmdTopLuck implements CommandExecutor, TabCompleter {
                         return false;
                     }
 
-                    ((Player) sender).openInventory(InvManager.getTopLuckPlayerInventory(args[0]));
+                    playerSender.openInventory(InvManager.getTopLuckPlayerInventory(args[0]));
                     sender.sendMessage(Main.getMessages().getMessage("playertopluckopened", "%player%", args[0]));
                     return true;
                 } else {
@@ -107,7 +117,7 @@ public class CmdTopLuck implements CommandExecutor, TabCompleter {
         }
 
         if (Permission.hasPermission(sender, "topluck.see")) {
-            ((Player) sender).openInventory(InvManager.getTopLuckInventory(0));
+            playerSender.openInventory(InvManager.getTopLuckInventory(0));
             sender.sendMessage(Main.getMessages().getMessage("topluckopened"));
             return true;
         } else {
@@ -126,8 +136,14 @@ public class CmdTopLuck implements CommandExecutor, TabCompleter {
             if (Permission.hasPermission(sender, "topluck.registerblock") && "registerblock".startsWith(args[0]))
                 msg.add("registerblock");
 
-            if (Permission.hasPermission(sender, "topluck.see"))
-                msg.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase())).collect(Collectors.toList()));
+            if (Permission.hasPermission(sender, "topluck.see")) {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    String name = player.getName();
+                    if (name.toLowerCase().startsWith(args[0].toLowerCase())) {
+                        msg.add(name);
+                    }
+                }
+            }
         }
         return (msg.isEmpty()) ? Collections.emptyList() : msg;
     }

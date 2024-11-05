@@ -4,6 +4,7 @@ import fr.tt54.topluck.Main;
 import fr.tt54.topluck.manager.InvManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -22,7 +23,10 @@ public class InvListener implements Listener {
                         event.getWhoClicked().openInventory(InvManager.getTopLuckPlayerInventory(event.getCurrentItem().getItemMeta().getDisplayName().substring(2)));
                     } else {
                         event.getWhoClicked().openInventory(InvManager.getTopLuckInventory(Integer.parseInt(event.getClickedInventory().getName().split("§4")[1]) - 1));
-                        event.getWhoClicked().sendMessage(Main.getMessages().getMessage("notconnected"));
+                        if (event.getWhoClicked() instanceof Player) {
+                            Player player = (Player) event.getWhoClicked();
+                            player.sendMessage(Main.getMessages().getMessage("notconnected"));
+                        }
                     }
                 } else if (event.getCurrentItem().getType() == Material.PAPER) {
                     if (event.getSlot() == 53) {
@@ -33,7 +37,7 @@ public class InvListener implements Listener {
                 }
             } else if (event.getClickedInventory().getName().contains("§cTopLuck ")) {
                 event.setCancelled(true);
-                if (event.getCurrentItem().getType() == Material.BARRIER && event.getCurrentItem().getItemMeta().getDisplayName().equals(Main.getMessages().getMessage("inventory.quit"))) {
+                if (event.getCurrentItem().getType() == Material.REDSTONE_LAMP_OFF && event.getCurrentItem().getItemMeta().getDisplayName().equals(Main.getMessages().getMessage("inventory.quit"))) {
                     event.getWhoClicked().openInventory(InvManager.getTopLuckInventory(0));
                 } else if (event.getCurrentItem().getType() == Material.ENDER_PEARL && event.getCurrentItem().getItemMeta().getDisplayName().equals(Main.getMessages().getMessage("inventory.teleport"))) {
                     if (Bukkit.getPlayer(event.getClickedInventory().getName().split(" ")[1].substring(2)) != null) {
@@ -41,17 +45,26 @@ public class InvListener implements Listener {
                         event.getWhoClicked().teleport(Bukkit.getPlayer(event.getClickedInventory().getName().split(" ")[1].substring(2)));
                     } else {
                         event.getWhoClicked().openInventory(InvManager.getTopLuckInventory(0));
-                        event.getWhoClicked().sendMessage(Main.getMessages().getMessage("notconnected"));
+                        if (event.getWhoClicked() instanceof Player) {
+                            Player player = (Player) event.getWhoClicked();
+                            player.sendMessage(Main.getMessages().getMessage("notconnected"));
+                        }
                     }
                 } else if (event.getCurrentItem().getType() == Material.CHEST && event.getCurrentItem().getItemMeta().getDisplayName().equals(Main.getMessages().getMessage("inventory.clear"))) {
                     if (Bukkit.getPlayer(event.getClickedInventory().getName().split(" ")[1].substring(2)) != null) {
                         Bukkit.getPlayer(event.getClickedInventory().getName().split(" ")[1].substring(2)).getInventory().setArmorContents(new ItemStack[4]);
                         Bukkit.getPlayer(event.getClickedInventory().getName().split(" ")[1].substring(2)).getInventory().clear();
                         Bukkit.getPlayer(event.getClickedInventory().getName().split(" ")[1].substring(2)).sendMessage(Main.getMessages().getMessage("clear"));
-                        event.getWhoClicked().sendMessage(Main.getMessages().getMessage("cleared", "%player%", event.getClickedInventory().getName().split(" ")[1].substring(2)));
+                        if (event.getWhoClicked() instanceof Player) {
+                            Player player = (Player) event.getWhoClicked();
+                            player.sendMessage(Main.getMessages().getMessage("cleared", "%player%", event.getClickedInventory().getName().split(" ")[1].substring(2)));
+                        }
                     } else {
                         event.getWhoClicked().openInventory(InvManager.getTopLuckInventory(0));
-                        event.getWhoClicked().sendMessage(Main.getMessages().getMessage("notconnected"));
+                        if (event.getWhoClicked() instanceof Player) {
+                            Player player = (Player) event.getWhoClicked();
+                            player.sendMessage(Main.getMessages().getMessage("notconnected"));
+                        }
                     }
                 }
             }
@@ -70,5 +83,4 @@ public class InvListener implements Listener {
             }
         }
     }
-
 }
